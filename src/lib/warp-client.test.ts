@@ -16,12 +16,12 @@ describe('WarpClient', () => {
     vi.clearAllMocks();
   });
 
-  it('should build arguments correctly for runAgent', async () => {
+  it('should build arguments correctly for agent.run', async () => {
     const client = new WarpClient();
     const mockExeca = execaModule.execa as any;
     mockExeca.mockResolvedValue({ stdout: 'ok', stderr: '', exitCode: 0 });
 
-    await client.runAgent({
+    await client.agent.run({
       prompt: 'hello world',
       debug: true,
       apiKey: 'test-key'
@@ -42,7 +42,7 @@ describe('WarpClient', () => {
     const mockExeca = execaModule.execa as any;
     mockExeca.mockResolvedValue({ stdout: 'ok', stderr: '', exitCode: 0 });
 
-    await client.runAgent({
+    await client.agent.run({
       prompt: 'test'
     });
 
@@ -60,7 +60,7 @@ describe('WarpClient', () => {
     const mockExeca = execaModule.execa as any;
     mockExeca.mockResolvedValue({ stdout: 'ok', stderr: '', exitCode: 0 });
 
-    await client.runAgent({
+    await client.agent.run({
       apiKey: 'new-key',
       prompt: 'test'
     });
@@ -77,7 +77,7 @@ describe('WarpClient', () => {
     const mockExeca = execaModule.execa as any;
     mockExeca.mockResolvedValue({ stdout: 'ok', stderr: '', exitCode: 0 });
 
-    await client.runAgent({
+    await client.agent.run({
       prompt: 'test',
       share: ['team:view', 'user@example.com:edit'],
       mcpServers: ['server1', 'server2']

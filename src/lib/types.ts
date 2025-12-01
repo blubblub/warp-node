@@ -19,3 +19,8 @@ export interface WarpExecutionResult {
   stderr: string;
   exitCode?: number;
 }
+
+export interface WarpProfile {
+  id: string;
+  name: string;
+}

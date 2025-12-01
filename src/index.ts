@@ -1,2 +1,2 @@
 export * from './lib/types.js';
-export * from './lib/warp-client.js';
+export { warp, WarpClient } from './lib/warp-client.js';
