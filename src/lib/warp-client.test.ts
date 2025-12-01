@@ -168,4 +168,19 @@ describe('WarpClient', () => {
       expect.objectContaining({ reject: false })
     );
   });
+
+  it('should execute prompt to go to speechblubs.com and summarize', async () => {
+    const client = new WarpClient();
+    const mockExeca = execaModule.execa as any;
+    mockExeca.mockResolvedValue({ stdout: 'Summary written to test.txt', stderr: '', exitCode: 0 });
+
+    const prompt = 'Go to speechblubs.com and write a summary to test.txt';
+    await client.agent.run({ prompt });
+
+    expect(mockExeca).toHaveBeenCalledWith(
+      'warp',
+      ['agent', 'run', '--prompt', prompt],
+      expect.objectContaining({ reject: false })
+    );
+  });
 });
