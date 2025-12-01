@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { WarpClient } from './warp-client.js';
+import { WarpClient, warp } from './warp-client.js';
 import * as execaModule from 'execa';
 
 // Mock execa
@@ -94,6 +94,78 @@ describe('WarpClient', () => {
         '--mcp-server', 'server2'
       ],
       expect.any(Object)
+    );
+  });
+
+  it('should list profiles via client.profiles.list', async () => {
+    const client = new WarpClient();
+    const mockExeca = execaModule.execa as any;
+    mockExeca.mockResolvedValue({
+      stdout: [
+        '│ ID     ┆ Name      │',
+        '│ 1      ┆ Default   │',
+        '│ 2      ┆ Automatic │',
+      ].join('\n'),
+      stderr: '',
+      exitCode: 0,
+    });
+
+    const profiles = await client.profiles.list();
+
+    expect(mockExeca).toHaveBeenCalledWith(
+      'warp',
+      ['agent', 'profile', 'list'],
+      expect.objectContaining({ reject: false })
+    );
+    expect(profiles).toEqual([
+      { id: '1', name: 'Default' },
+      { id: '2', name: 'Automatic' },
+    ]);
+  });
+
+  it('should find profile by name via client.profiles.findByName', async () => {
+    const client = new WarpClient();
+    const mockExeca = execaModule.execa as any;
+    mockExeca.mockResolvedValue({
+      stdout: [
+        '│ ID     ┆ Name      │',
+        '│ 1      ┆ Default   │',
+        '│ 2      ┆ Automatic │',
+      ].join('\n'),
+      stderr: '',
+      exitCode: 0,
+    });
+
+    const profile = await client.profiles.findByName('automatic');
+    expect(profile).toEqual({ id: '2', name: 'Automatic' });
+  });
+
+  it('should build arguments correctly for agent.spawn', () => {
+    const client = new WarpClient();
+    const mockExeca = execaModule.execa as any;
+    mockExeca.mockReturnValue({ stdout: 'process' }); // Mock return value for spawn
+
+    client.agent.spawn({
+      prompt: 'spawn test',
+    });
+
+    expect(mockExeca).toHaveBeenCalledWith(
+      'warp',
+      ['agent', 'run', '--prompt', 'spawn test'],
+      expect.objectContaining({ all: true })
+    );
+  });
+
+  it('should use default warp instance correctly', async () => {
+    const mockExeca = execaModule.execa as any;
+    mockExeca.mockResolvedValue({ stdout: 'ok', stderr: '', exitCode: 0 });
+
+    await warp.agent.run({ prompt: 'warp instance test' });
+
+    expect(mockExeca).toHaveBeenCalledWith(
+      'warp',
+      ['agent', 'run', '--prompt', 'warp instance test'],
+      expect.objectContaining({ reject: false })
     );
   });
 });
